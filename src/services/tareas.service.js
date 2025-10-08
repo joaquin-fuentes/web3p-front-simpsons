@@ -4,7 +4,7 @@ import clientAxios from "../api/clientAxios.js";
 export const obtenerTareas = async () => {
   try {
     const response = await clientAxios.get("/tareas");
-    return response.data;
+    return response.data.tareas;
   } catch (error) {
     console.error("Error fetching tasks:", error);
     throw error;

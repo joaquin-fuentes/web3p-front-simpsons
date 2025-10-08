@@ -3,7 +3,7 @@ import { Button, FormControl, ListGroup } from "react-bootstrap";
 // import loquesea from "../assets/imagen1.jpg";
 import { guardarEnLocalStorage } from "../../utils/localStorage.util.js";
 import ItemTarea from "./ItemTarea.jsx";
-import clientAxios from "../../api/clientAxios.js";
+import { obtenerTareas } from "../../services/tareas.service.js";
 
 const ListadoTareas = () => {
   const [listadoTareas, setListadoTareas] = useState([]);
@@ -11,23 +11,19 @@ const ListadoTareas = () => {
   const [editandoIndex, setEditandoIndex] = useState(null);
   const [tareaModificada, setTareaModificada] = useState("");
 
-  const API_URL = "http://localhost:3000/api/tareas";
+  async function fetchTareas() {
+    try {
+      // const respuesta = await fetch(API_URL);
+      const tareas = await obtenerTareas();
+      // const data = await respuesta.json();
+      console.log(tareas);
+      setListadoTareas(tareas);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
-    // const tareasGuardadas = obtenerDeLocalStorage("listadoTareas");
-    // acceder al endpoint del backend de tareas y obtener las tareas
-    async function fetchTareas() {
-      try {
-        // const respuesta = await fetch(API_URL);
-        const respuesta = await clientAxios.get("/tareas");
-        // const data = await respuesta.json();
-        console.log(respuesta);
-        setListadoTareas(respuesta.data.tareas);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
     fetchTareas();
   }, []);
 
