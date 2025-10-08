@@ -1,0 +1,14 @@
+.alturaMinimaContenedor {
+  min-height: 100dvh;
+}
+
+.alturaMinima {
+  height: calc(100dvh - 95px);
+}
+
+.hero {
+  background-image: url(./assets/imagenesSimpsons/fondo.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
