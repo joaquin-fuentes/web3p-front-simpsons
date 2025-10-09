@@ -33,7 +33,7 @@ const ItemTarea = ({
               </Button>
               <Button
                 variant="danger"
-                onClick={() => handleDelete(tarea, indice)}
+                onClick={() => handleDelete(indice, tarea)}
               >
                 Eliminar
               </Button>
@@ -47,7 +47,10 @@ const ItemTarea = ({
               onChange={(e) => setTareaModificada(e.target.value)}
             />
             <div className="d-flex gap-3">
-              <Button variant="success" onClick={() => handleUpdate(indice)}>
+              <Button
+                variant="success"
+                onClick={() => handleUpdate(indice, tareaModificada)}
+              >
                 Guardar
               </Button>
             </div>

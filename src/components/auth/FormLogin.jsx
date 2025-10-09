@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../services/auth.service.js";
 function FormLogin() {
   const {
     register,
@@ -18,51 +19,19 @@ function FormLogin() {
   });
   const navegacion = useNavigate();
 
-  function obtenerUsuariosDeLocalStorage() {
+  async function onSubmit(data) {
     try {
-      const listadoUsuariosJSON = localStorage.getItem("usuarios");
-      const listadoUsuarios = JSON.parse(listadoUsuariosJSON);
-      return listadoUsuarios ? listadoUsuarios : [];
+      // llamar al servicio de login
+      const message = await loginUser(data);
+      // si sale bien mostrar un msj al usuario
+      alert(message);
+      // si sale bien redireccionar al login
+      reset();
+      navegacion("/");
     } catch (error) {
-      console.error(error);
-      throw error;
+      // si algun error lo mostramos en consola o en un alert
+      console.log(error);
     }
-  }
-
-  function onSubmit(data) {
-    const usuariosDeLaDb = obtenerUsuariosDeLocalStorage();
-    const usuario = usuariosDeLaDb.find(
-      (usuarioLS) => usuarioLS.email === data.email
-    );
-    if (!usuario) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "El usuario no existe en la base de datos",
-      });
-      return;
-    }
-    if (usuario.password != data.password) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Contraseña incorrecta",
-      });
-      return;
-    }
-
-    const usuarioLogueado = {
-      email: data.email,
-      loginAt: new Date().toISOString(),
-    };
-    sessionStorage.setItem("usuario", JSON.stringify(usuarioLogueado));
-    Swal.fire({
-      title: "Usuario Logueado",
-      icon: "success",
-      draggable: true,
-    });
-    reset();
-    navegacion("/");
   }
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -94,8 +63,8 @@ function FormLogin() {
           {...register("password", {
             required: "El password es requerido",
             minLength: {
-              value: 4,
-              message: "El minimo es 4 caracteres",
+              value: 3,
+              message: "El minimo es 3 caracteres",
             },
           })}
         />

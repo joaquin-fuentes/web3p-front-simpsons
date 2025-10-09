@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, FormControl, ListGroup } from "react-bootstrap";
 // import loquesea from "../assets/imagen1.jpg";
-import { guardarEnLocalStorage } from "../../utils/localStorage.util.js";
 import ItemTarea from "./ItemTarea.jsx";
-import { obtenerTareas } from "../../services/tareas.service.js";
+import {
+  actualizarTarea,
+  crearTarea,
+  eliminarTarea,
+  obtenerTareas,
+} from "../../services/tareas.service.js";
 
 const ListadoTareas = () => {
   const [listadoTareas, setListadoTareas] = useState([]);
@@ -27,40 +31,57 @@ const ListadoTareas = () => {
     fetchTareas();
   }, []);
 
-  useEffect(() => {
-    // Código que se ejecuta al montar o actualizar
-    guardarEnLocalStorage("listadoTareas", listadoTareas);
-    //codigo que se ejecuta al desmontar
-  }, [listadoTareas]);
-
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (tarea != "") {
-      setListadoTareas([...listadoTareas, tarea]);
-      // limpiar el formulario
-      setTarea("");
+      // enviar esta tarea a mi base de datos a traves de un servicio
+      try {
+        const nuevaTarea = {
+          descripcion: tarea,
+        };
+        await crearTarea(nuevaTarea);
+        // actualizar el listado de tareas del front
+        fetchTareas();
+        alert("Tarea creada con éxito");
+        // limpiar el formulario
+        setTarea("");
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       alert("Debe escribir algo");
     }
   }
 
-  function handleDelete(tarea, indiceAEleminiar) {
+  async function handleDelete(id, tarea) {
     if (confirm(`Segudo que desea eliminar esta tarea? ${tarea}`)) {
-      const nuevoListadoTareas = listadoTareas.filter(
-        (item, index) => index != indiceAEleminiar
-      );
-      setListadoTareas(nuevoListadoTareas);
+      try {
+        // llamar al servicio que elimina la tarea
+        await eliminarTarea(id);
+        // actualizar el listado
+        fetchTareas();
+        // mostrar msj al usuario
+        alert(`La tarea: ${tarea} fue eliminada con éxito`);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
-  function handleUpdate(indiceAEditar) {
-    // crear nuevo array
-    const nuevoArray = [...listadoTareas];
-    // de ese Array, acceder al elemento que quiero modificar y asignarle un nuevo valor
-    nuevoArray[indiceAEditar] = tareaModificada;
-    // guardar el nuevo arrary en el listado de tareas
-    setListadoTareas(nuevoArray);
-    setEditandoIndex(null);
-    setTareaModificada("");
+  async function handleUpdate(id, tareaModificada) {
+    try {
+      const tareaActualizada = {
+        descripcion: tareaModificada,
+      };
+      // utilizar un servicio que envíe la tarea actualizada
+      await actualizarTarea(id, tareaActualizada);
+      alert("Tarea actualizada con éxito");
+      fetchTareas();
+      // actualizar el listado de tareas
+      setEditandoIndex(null);
+      setTareaModificada("");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (

@@ -8,12 +8,12 @@ const clientAxios = axios.create({
 });
 
 // Interceptor para agregar token automáticamente
-// clientAxios.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("token"); // Obtener token guardado
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`; // Agregar al header
-//   }
-//   return config;
-// });
+clientAxios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token"); // Obtener token guardado
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`; // Agregar al header
+  }
+  return config;
+});
 
 export default clientAxios;
