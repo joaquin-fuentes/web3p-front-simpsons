@@ -9,7 +9,7 @@ import Error404Page from "../pages/Error404Page";
 import LayoutConNav from "../layouts/LayoutConNav";
 import UserRoute from "./UserRoute";
 import TasksPage from "../pages/TasksPage.jsx";
-
+import ProductPage from "../pages/ProductPage.jsx";
 const AppRouter = () => {
   return (
     <Routes>
@@ -23,9 +23,12 @@ const AppRouter = () => {
           ></Route>
           <Route path="/admin" element={<AdminPage></AdminPage>}></Route>
           <Route path="/tareas" element={<TasksPage></TasksPage>}></Route>
+          <Route
+            path="/productos"
+            element={<ProductPage></ProductPage>}
+          ></Route>
         </Route>
       </Route>
-
       {/* en el layout sin navbar  */}
       <Route path="/login" element={<LoginPage></LoginPage>}></Route>
       <Route path="/registro" element={<RegisterPage></RegisterPage>}></Route>
