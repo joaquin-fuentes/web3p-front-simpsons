@@ -63,6 +63,9 @@ const Header = () => {
               <Nav.Link as={NavLink} to="/tareas">
                 Listado Tareas
               </Nav.Link>
+              <Nav.Link as={NavLink} to="/productos">
+                Productos
+              </Nav.Link>
               <Button variant="danger" className="mx-3" onClick={handleLogout}>
                 Cerrar sesión
               </Button>
