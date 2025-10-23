@@ -57,17 +57,6 @@ VITE_FIREBASE_STORAGE_BUCKET=TU_STORAGE_BUCKET
 VITE_FIREBASE_MESSAGING_SENDER_ID=TU_SENDER_ID
 VITE_FIREBASE_APP_ID=TU_APP_ID
 ```
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDlN4VJbGGML4mKzoW075FceRe3iI-ehuM",
-  authDomain: "prueba222-27f2a.firebaseapp.com",
-  projectId: "prueba222-27f2a",
-  storageBucket: "prueba222-27f2a.firebasestorage.app",
-  messagingSenderId: "502259281415",
-  appId: "1:502259281415:web:24628d2abbc0d7350d84a2",
-  measurementId: "G-PQJGBNCK8B"
-};
-
 Nota: Nunca subir `.env` al repositorio. Compartir un `.env.example` sin valores reales.
 
 ---
