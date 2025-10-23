@@ -3,18 +3,18 @@ import { Modal, Form, Button } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { actualizarProducto } from "../../services/products.service";
+import { actualizarProducto } from "../../services/productos.service";
 export default function EditProductModal({ producto, alCerrar, alGuardar }) {
   const [camposAdicionales, setCamposAdicionales] = useState({
-    description: producto?.description || "",
-    urlimagen: producto?.urlimagen || "",
+    descripcion: producto?.descripcion || "",
+    urlimagen: producto?.urlImagen || "",
     stock: producto?.stock || "",
   });
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isSubmitting },
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -28,19 +28,19 @@ export default function EditProductModal({ producto, alCerrar, alGuardar }) {
       precio: producto?.precio ?? "",
     });
     setCamposAdicionales({
-      description: producto?.description || "",
-      urlimagen: producto?.urlimagen || "",
+      descripcion: producto?.descripcion || "",
+      urlimagen: producto?.urlImagen || "",
       stock: producto?.stock || "",
     });
   }, [producto, reset]);
   const alEnviar = async (datos) => {
     try {
-      await actualizarProducto(producto.id, {
+      await actualizarProducto(producto._id, {
         nombre: datos.nombre.trim(),
         precio: parseFloat(datos.precio) || 0,
-        description: camposAdicionales.description.trim(),
+        descripcion: camposAdicionales.descripcion.trim(),
         stock: parseInt(camposAdicionales.stock) || 0,
-        urlimagen: camposAdicionales.urlimagen.trim(),
+        urlImagen: camposAdicionales.urlimagen.trim(),
       });
       Swal.fire({
         title: "Producto actualizado",
@@ -50,16 +50,12 @@ export default function EditProductModal({ producto, alCerrar, alGuardar }) {
       });
       alGuardar?.();
     } catch (err) {
-      if (err?.code === "NOMBRE_EXISTENTE") {
-        Swal.fire({
-          title: "Nombre ya utilizado",
-          text: "Existe otro producto con ese nombre.",
-          icon: "warning",
-        });
-      } else {
-        console.error(err);
-        Swal.fire({ title: "Error al actualizar", icon: "error" });
-      }
+      console.error("Error al actualizar producto:", err);
+      Swal.fire({
+        title: "Error al actualizar",
+        text: "No se pudo actualizar el producto",
+        icon: "error",
+      });
     }
   };
   const handleCampoChange = (campo, valor) => {
@@ -120,29 +116,27 @@ export default function EditProductModal({ producto, alCerrar, alGuardar }) {
               rows={3}
               maxLength={114}
               placeholder="Descripción del producto"
-              value={camposAdicionales.description}
+              value={camposAdicionales.descripcion}
               onChange={(evento) =>
-                handleCampoChange("description", evento.target.value)
+                handleCampoChange("descripcion", evento.target.value)
               }
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Stock</Form.Label>
             <Form.Control
-            
               type="number"
               placeholder="0"
               value={camposAdicionales.stock}
               onChange={(evento) => {
-            const valor = parseInt(evento.target.value);
-            
-                        
-            if (!isNaN(valor) && valor >= 0) {
-                handleCampoChange("stock", valor);
-            }
-            else if (valor < 0) {
-                handleCampoChange("stock", 0);
-            }}}
+                const valor = parseInt(evento.target.value);
+
+                if (!isNaN(valor) && valor >= 0) {
+                  handleCampoChange("stock", valor);
+                } else if (valor < 0) {
+                  handleCampoChange("stock", 0);
+                }
+              }}
             />
           </Form.Group>
           <Form.Group className="mb-3">

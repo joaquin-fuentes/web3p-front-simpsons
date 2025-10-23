@@ -3,8 +3,8 @@ import { Table, Button } from "react-bootstrap";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   obtenerProductos,
-  eliminarProductoPorId,
-} from "../../services/products.service";
+  eliminarProducto,
+} from "../../services/productos.service";
 import CreateProductModal from "./CreateProductosModal";
 import EditProductModal from "./EditProductosModal";
 import FilaTabla from "./FilaTabla";
@@ -22,15 +22,22 @@ export default function TablaProductos() {
   const [editando, setEditando] = useState(null);
   const [creando, setCreando] = useState(false);
 
-  const cargarProductos = () => setProductos(obtenerProductos());
+  const cargarProductos = async () => {
+    try {
+      const productosData = await obtenerProductos();
+      setProductos(productosData);
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron cargar los productos",
+        icon: "error",
+      });
+    }
+  };
 
   useEffect(() => {
     cargarProductos();
-    const enAlmacenamiento = (evento) => {
-      if (evento.key === "productos") cargarProductos();
-    };
-    window.addEventListener("storage", enAlmacenamiento);
-    return () => window.removeEventListener("storage", enAlmacenamiento);
   }, []);
 
   const manejarEliminar = async (id) => {
@@ -43,14 +50,23 @@ export default function TablaProductos() {
       cancelButtonText: "Cancelar",
     });
     if (resultado.isConfirmed) {
-      eliminarProductoPorId(id);
-      cargarProductos();
-      Swal.fire({
-        title: "Producto eliminado",
-        icon: "success",
-        timer: 1200,
-        showConfirmButton: false,
-      });
+      try {
+        await eliminarProducto(id);
+        cargarProductos();
+        Swal.fire({
+          title: "Producto eliminado",
+          icon: "success",
+          timer: 1200,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error("Error al eliminar producto:", error);
+        Swal.fire({
+          title: "Error",
+          text: "No se pudo eliminar el producto",
+          icon: "error",
+        });
+      }
     }
   };
 
@@ -79,7 +95,7 @@ export default function TablaProductos() {
           {productos.length ? (
             productos.map((producto, idx) => (
               <FilaTabla
-                key={producto.id ?? idx}
+                key={producto._id ?? idx}
                 producto={producto}
                 idx={idx}
                 formatearFecha={formatearFecha}

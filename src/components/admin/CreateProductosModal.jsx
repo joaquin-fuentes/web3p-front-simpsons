@@ -2,11 +2,10 @@ import { Modal, Form, Button } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import {
-  agregarProducto,
-  obtenerProductos,
-} from "../../services/products.service";
+import { crearProducto } from "../../services/productos.service";
+import { uploadImageAndGetURL } from "../../services/storage.service.js";
 export default function CreateProductModal({ alCerrar, alGuardar }) {
+  // const [previewUrl, setPreviewUrl] = useState(null);
   const [camposAdicionales, setCamposAdicionales] = useState({
     descripcion: "",
     urlimagen: "",
@@ -16,7 +15,7 @@ export default function CreateProductModal({ alCerrar, alGuardar }) {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isSubmitting },
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -30,43 +29,46 @@ export default function CreateProductModal({ alCerrar, alGuardar }) {
       [campo]: valor,
     }));
   };
-  const alEnviar = (datos) => {
-    const productos = obtenerProductos();
-    const duplicado = productos.some(
-      (producto) =>
-        producto.nombre.toLowerCase() === datos.nombre.trim().toLowerCase()
-    );
-    if (duplicado) {
-      Swal.fire({
-        title: "Producto ya existe",
-        text: "Ya hay un producto con ese nombre registrado",
-        icon: "warning",
+  const alEnviar = async (datos) => {
+    try {
+      // si la imagen es grande muestro un alerta con el error
+      let urlImagenFirebase = await uploadImageAndGetURL(
+        camposAdicionales.file
+      );
+      console.log(camposAdicionales.file);
+      const nuevoProducto = {
+        nombre: datos.nombre.trim(),
+        precio: parseFloat(datos.precio) || 0,
+        descripcion: camposAdicionales.descripcion.trim(),
+        stock: parseInt(camposAdicionales.stock) || 0,
+        urlImagen: urlImagenFirebase,
+      };
+
+      await crearProducto(nuevoProducto);
+
+      reset();
+      setCamposAdicionales({
+        descripcion: "",
+        urlimagen: "",
+        stock: "",
       });
-      return;
+
+      Swal.fire({
+        title: "Producto creado",
+        icon: "success",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+
+      alGuardar?.();
+    } catch (error) {
+      console.error("Error al crear producto:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo crear el producto",
+        icon: "error",
+      });
     }
-    const nuevoProducto = {
-      id: Date.now(),
-      nombre: datos.nombre.trim(),
-      precio: parseFloat(datos.precio) || 0,
-      description: camposAdicionales.descripcion.trim(),
-      stock: parseInt(camposAdicionales.stock) || 0,
-      urlimagen: camposAdicionales.urlimagen.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    agregarProducto(nuevoProducto);
-    reset();
-    setCamposAdicionales({
-      descripcion: "",
-      urlimagen: "",
-      stock: "",
-    });
-    Swal.fire({
-      title: "Producto creado",
-      icon: "success",
-      timer: 1200,
-      showConfirmButton: false,
-    });
-    alGuardar?.();
   };
   return (
     <Modal
@@ -151,13 +153,12 @@ export default function CreateProductModal({ alCerrar, alGuardar }) {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>URL de la imagen</Form.Label>
+            <Form.Label>Imagen de producto</Form.Label>
             <Form.Control
-              type="url"
-              placeholder="https://ejemplo.com/imagen.jpg"
-              value={camposAdicionales.urlimagen}
+              type="file"
+              accept="image/*"
               onChange={(evento) =>
-                handleCampoChange("urlimagen", evento.target.value)
+                handleCampoChange("file", evento.target.files?.[0] ?? null)
               }
             />
             {camposAdicionales.urlimagen && (

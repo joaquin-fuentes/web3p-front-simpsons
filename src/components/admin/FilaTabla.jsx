@@ -36,7 +36,7 @@ const FilaTabla = ({
   //  };
 
   return (
-    <tr key={producto.id} className="fila-tabla">
+    <tr key={producto._id} className="fila-tabla">
       <td className="col-numero">
         <div className="numero-fila">
           <strong>{idx + 1}</strong>
@@ -61,10 +61,11 @@ const FilaTabla = ({
 
       <td className="col-nombre">
         <div className="contenedor-nombre">
-          {producto.urlimagen && (
+          {producto.urlImagen && (
             <img
-              src={producto.urlimagen}
+              src={producto.urlImagen}
               alt={producto.nombre}
+              style={{ width: "80px" }}
               className="imagen-producto"
             />
           )}
@@ -74,7 +75,7 @@ const FilaTabla = ({
 
       <td className="col-descripcion">
         <div className="descripcion-producto">
-          {producto.description || "Sin descripción"}
+          {producto.descripcion || "Sin descripción"}
         </div>
       </td>
 
@@ -114,7 +115,7 @@ const FilaTabla = ({
             className="btn-tabla btn-eliminar"
             size="sm"
             variant="danger"
-            onClick={() => manejarEliminar(producto.id)}
+            onClick={() => manejarEliminar(producto._id)}
           >
             Eliminar
           </Button>
